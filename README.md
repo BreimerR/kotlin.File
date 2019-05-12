@@ -1,8 +1,3 @@
-# Hello World
+# Kotlin-Native File lib class
 
-A basic "Hello, World" in Kotlin/Native and Gradle.
-
-Use the following Gradle commands
-* to build: `./gradlew assemble`
-* to test: `./gradlew check`
-* to run:  `./gradlew runHelloWorldAppReleaseExecutableHelloWorld`
+Easy to use file interaction class
