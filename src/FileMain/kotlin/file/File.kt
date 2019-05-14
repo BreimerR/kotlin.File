@@ -16,6 +16,10 @@ class FileStatic : StaticClass() {
 class FileClass(private val fullFilePathWithExtension: String) : Class<FileStatic>() {
     override val self = File
 
+    operator fun invoke() {
+
+    }
+
     var start = 0
     var end = SEEK_END
     var i = 0
@@ -54,11 +58,12 @@ class FileClass(private val fullFilePathWithExtension: String) : Class<FileStati
         if (file == null) throw FileError("File $fullFilePathWithExtension does not exist")
     }
 
-    fun open(mode: String = "r", action: (FileClass) -> Unit) {
+    fun open(mode: String = "r", action: FileClass.() -> Unit) {
         open(mode)
         // this will never be null since we are throwing error  file not found
-        action(this)
+        this.apply(action)
     }
+
 
     fun safeOpen(mode: String = "r"): Boolean {
         return try {
@@ -79,12 +84,15 @@ class FileClass(private val fullFilePathWithExtension: String) : Class<FileStati
 
     // SEEK_SET = beginning of the file
     fun moveCursor(to: Int, from: Int = SEEK_SET) {
-        fseek(file, to.long, from)
+        fseek(file, from.long, to)
+
+
         if (atEnd) {
             if (to < i) {
                 atEnd = false
             }
         }
+
         i = to
     }
 
@@ -107,10 +115,36 @@ class FileClass(private val fullFilePathWithExtension: String) : Class<FileStati
         return chars
     }
 
-    val size: Byte
+    val size: Long
         get() {
-            return 0
+            moveCursor(end)
+
+            val s = cursorPos
+
+            moveCursor(start)
+
+            return s
         }
+
+    val fileSize: FileSizeClass
+        get() {
+            return FileSize(size)
+        }
+
+    private val cursorPos: Long
+        get() {
+            return ftell(file)
+        }
+
+    override fun toString(): String {
+        var content = "";
+
+        while (!atEnd) {
+            content += nextChar
+        }
+
+        return content;
+    }
 }
 
 
